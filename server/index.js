@@ -9,14 +9,15 @@ const Room = require("./models/Room");
 const app = express();
 app.use(cors());
 app.use(express.json());
+require("dotenv").config();
 const connectDB = async () => {
   try {
-    await mongoose.connect('mongodb+srv://gayathris2023aiml:gaya1804@gayathri.c4paq.mongodb.net/collab-code?retryWrites=true&w=majority&appName=gayathri', {
-      connectTimeoutMS: 10000, // Increase connection timeout
-      socketTimeoutMS: 45000,  // Increase socket timeout
-      serverSelectionTimeoutMS: 10000, // Increase server selection timeout
-      heartbeatFrequencyMS: 2000, // More frequent heartbeats
-      maxPoolSize: 10, // Increase connection pool
+    await mongoose.connect(process.env.MONGO_URI, {
+      connectTimeoutMS: 10000,
+      socketTimeoutMS: 45000,
+      serverSelectionTimeoutMS: 10000,
+      heartbeatFrequencyMS: 2000,
+      maxPoolSize: 10,
       retryWrites: true,
       retryReads: true
     });
@@ -26,6 +27,7 @@ const connectDB = async () => {
     setTimeout(connectDB, 5000);
   }
 };
+
 
 connectDB();
 
@@ -92,10 +94,11 @@ app.post("/run-code", async (req, res) => {
       },
       {
         headers: {
-          "Content-Type": "application/json",
-          "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
-          "X-RapidAPI-Key": "cdd2f12b16msh0bd22d266f5bca2p1442e4jsn1fbe9ba49d9a", 
-        },
+  "Content-Type": "application/json",
+  "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
+  "X-RapidAPI-Key": process.env.RAPIDAPI_KEY,
+}
+
       }
     );
 
@@ -109,10 +112,12 @@ app.post("/run-code", async (req, res) => {
         const resCheck = await axios.get(
           `https://judge0-ce.p.rapidapi.com/submissions/${token}?base64_encoded=false`,
           {
-            headers: {
-              "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
-              "X-RapidAPI-Key": "cdd2f12b16msh0bd22d266f5bca2p1442e4jsn1fbe9ba49d9a", // REPLACE here too
-            },
+           headers: {
+  "Content-Type": "application/json",
+  "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
+  "X-RapidAPI-Key": process.env.RAPIDAPI_KEY,
+},
+
           }
         );
 
@@ -285,7 +290,8 @@ io.on("connection", (socket) => {
   });
 });
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
+
 server.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
